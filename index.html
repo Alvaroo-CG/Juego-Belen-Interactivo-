@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Belén Interactivo</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+</head>
+<body>
+  <div id="instrucciones-modal" class="modal">
+    <div class="modal-contenido">
+      <button class="cerrar-modal">×</button>
+      <h2>Bienvenido al nuevo juego del Belén</h2>
+      <h3>Instrucciones:</h3>
+      <ul style="text-align: left; padding-left: 20px;">
+        <li>Utiliza el ratón para mover las figuritas</li>
+        <li>Mueve las figuritas al lugar que le corresponde</li>
+        <li>Cuando termines haz click en "Finalizar"</li>
+      </ul>
+    </div>
+  </div>
+
+  <div id="finalizar-modal" class="modal">
+    <div class="modal-contenido">
+      <button class="cerrar-modal">×</button>
+      <h2>¡Tu Belén está completo!</h2>
+      <p>¿Qué te gustaría hacer ahora?</p>
+
+      <div class="opciones-finalizar">
+        <button id="imprimir-btn" class="opcion-btn">Imprimir escena</button>
+        <button id="descargar-btn" class="opcion-btn">Descargar imagen</button>
+        <button id="redes-btn" class="opcion-btn">Publicar en redes sociales</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="redes-modal" class="modal">
+    <div class="modal-contenido">
+      <button class="cerrar-modal">×</button>
+      <h2>Compartir en redes sociales</h2>
+      <div style="display: flex; justify-content: center; gap: 15px; margin-top: 20px;">
+        <button class="redes-btn" onclick="compartirFacebook()">
+          <svg width="20" height="20" fill="white" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"
+            style="margin-right: 5px;">
+            <path
+              d="M24 12.0736C24 5.40425 18.6274 0 12 0C5.37258 0 0 5.40425 0 12.0736C0 18.0953 4.3882 23.0936 10.125 24V15.563H7.07812V12.0736H10.125V9.41363C10.125 6.40661 11.9165 4.73457 14.6577 4.73457C15.9706 4.73457 17.3438 4.96863 17.3438 4.96863V7.9371H15.8306C14.3396 7.9371 13.875 8.866 13.875 9.82294V12.0736H17.2031L16.6719 15.563H13.875V24C19.6118 23.0936 24 18.0953 24 12.0736Z" />
+          </svg>
+          Facebook
+        </button>
+
+        <button class="redes-btn" onclick="compartirTwitter()">
+          <svg width="20" height="20" fill="white" viewBox="0 0 24 24" style="margin-right: 5px;"
+            xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M1.5 1L9.987 13.237L1.535 23h2.247l6.84-7.832L16.492 23H23L13.983 10.206L21.924 1h-2.247l-6.237 7.144L7.742 1H1.5Z" />
+          </svg>
+          Twitter
+        </button>
+
+        <button class="redes-btn" onclick="compartirWhatsApp()">
+          <svg width="25" height="25" fill="white" viewBox="0 0 30 30" style="margin-right: 5px;"
+            xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M16.04 2.004c-7.732 0-13.995 6.264-13.995 13.996 0 2.467.646 4.888 1.866 7.02L2 30l7.26-1.902a14.01 14.01 0 006.78 1.716h.004c7.733 0 13.996-6.264 13.996-13.995S23.773 2.004 16.04 2.004zm0 25.515a11.52 11.52 0 01-5.86-1.573l-.418-.247-4.31 1.127 1.15-4.183-.272-.429a11.522 11.522 0 01-1.616-5.98c0-6.386 5.196-11.582 11.582-11.582s11.582 5.196 11.582 11.582c0 6.386-5.196 11.582-11.582 11.582zm6.28-8.68c-.342-.171-2.024-1-2.337-1.115-.313-.114-.54-.171-.768.171s-.881 1.114-1.079 1.346c-.198.229-.396.257-.737.086-.342-.171-1.445-.531-2.754-1.693-1.018-.908-1.704-2.031-1.902-2.373-.198-.342-.021-.526.15-.697.154-.154.343-.396.515-.594.172-.198.229-.343.343-.572.114-.229.057-.429-.028-.618-.086-.171-.792-1.925-1.085-2.637-.285-.683-.572-.592-.792-.602-.198-.009-.429-.011-.66-.011s-.604.086-.921.429c-.313.342-1.211 1.171-1.211 2.858 0 1.686 1.232 3.313 1.403 3.536.171.229 2.423 3.695 5.876 5.183.823.353 1.463.566 1.964.722.827.263 1.581.227 2.177.137.665-.099 2.048-.834 2.338-1.641.289-.806.289-1.5.202-1.641-.085-.14-.313-.229-.656-.396z" />
+          </svg>
+          WhatsApp
+        </button>
+
+      </div>
+    </div>
+  </div>
+
+  <h2>Arma tu Belén</h2>
+
+  <div id="seleccion-fondo" style="margin-bottom: 20px;">
+    <h3>Elige el fondo:</h3>
+    <img src="img/nacimiento/esc-nacimiento.png" width="100" onclick="cambiarFondo('img/nacimiento/esc-nacimiento.png')"
+      style="cursor:pointer; border:2px solid #ccc; margin:5px;">
+    <img src="img/huidaegipto/esc-huidaegipto.png" width="100" onclick="cambiarFondo('img/huidaegipto/esc-huidaegipto.png')"
+      style="cursor:pointer; border:2px solid #ccc; margin:5px;">
+    <img src="img/anunciacion/esc-anunciacion.png" width="100" onclick="cambiarFondo('img/anunciacion/esc-anunciacion.png')"
+      style="cursor:pointer; border:2px solid #ccc; margin:5px;">
+    <img src="img/posada/esc-posada.png" width="100" onclick="cambiarFondo('img/posada/esc-posada.png')"
+      style="cursor:pointer; border:2px solid #ccc; margin:5px;">
+    <img src="img/adoracionreyesmagos/esc-adoracionreyesmagos.png" width="100" onclick="cambiarFondo('img/adoracionreyesmagos/esc-adoracionreyesmagos.png')"
+      style="cursor:pointer; border:2px solid #ccc; margin:5px;">
+  </div>
+
+  <h2 id="titulo-escena" style="text-align:center; margin: 10px 0;">Nacimiento</h2>
+
+  <div id="escenario">
+    <img id="fondo-impresion" src="img/nacimiento/esc-nacimiento.png"
+      style="position: absolute; top:0; left:0; width: 100%; height: 100%; z-index: 0; pointer-events: none; user-select:none;">
+    <div class="marca-agua">Belencribs</div>
+  </div>
+
+  <div id="controles">
+    <button onclick="limpiarTablero()">Limpiar tablero</button>
+    <button onclick="finalizar()" style="margin-left: 10px;">Finalizar</button>
+  </div>
+
+  <div id="bandeja">
+    <img src="img/nacimiento/jesus.png" draggable="true" id="jesus" class="pieza">
+    <img src="img/nacimiento/maria.png" draggable="true" id="maria" class="pieza">
+    <img src="img/nacimiento/jose.png" draggable="true" id="jose" class="pieza">
+    <img src="img/nacimiento/mula.png" draggable="true" id="mula" class="pieza">
+    <img src="img/nacimiento/buey.png" draggable="true" id="buey" class="pieza">
+    <img src="img/nacimiento/pastorcillo.png" draggable="true" id="pastorcillo" class="pieza">
+    <img src="img/nacimiento/angelito.png" draggable="true" id="angelito" class="pieza">
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
