@@ -2,6 +2,9 @@ document.addEventListener("DOMContentLoaded", function () {
   setTimeout(function () {
     mostrarModal("instrucciones-modal");
   }, 500);
+
+  const fondoInicial = "img/nacimiento/esc-nacimiento.png";
+  cambiarFondo(fondoInicial);
 });
 
 function mostrarModal(id) {
@@ -67,9 +70,7 @@ function capturarEscenario(callback) {
 function compartirFacebook() {
   capturarEscenario((dataURL) => {
     subirAImgur(dataURL, (url) => {
-      const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
-        url
-      )}`;
+      const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
       window.open(facebookUrl, "_blank");
     });
   });
@@ -80,9 +81,7 @@ function compartirTwitter() {
   capturarEscenario((dataURL) => {
     subirAImgur(dataURL, (url) => {
       const text = "Mira mi Belén interactivo:";
-      const twitterUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(
-        url
-      )}&text=${encodeURIComponent(text)}`;
+      const twitterUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
       window.open(twitterUrl, "_blank");
     });
   });
@@ -93,9 +92,7 @@ function compartirWhatsApp() {
   capturarEscenario((dataURL) => {
     subirAImgur(dataURL, (url) => {
       const text = "Mira mi Belén interactivo:";
-      const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(
-        text + " " + url
-      )}`;
+      const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text + " " + url)}`;
       window.open(whatsappUrl, "_blank");
     });
   });
@@ -128,30 +125,6 @@ function subirAImgur(dataURL, callback) {
 }
 
 const escenario = document.getElementById("escenario");
-let piezaArrastrada = null;
-
-document.addEventListener("dragstart", (e) => {
-  if (e.target.classList.contains("pieza")) {
-    piezaArrastrada = e.target;
-  }
-});
-
-escenario.addEventListener("dragover", (e) => e.preventDefault());
-
-escenario.addEventListener("drop", (e) => {
-  e.preventDefault();
-  if (piezaArrastrada) {
-    const rect = escenario.getBoundingClientRect();
-    const clon = piezaArrastrada.cloneNode(true);
-    clon.style.position = "absolute";
-    clon.style.left = `${e.clientX - rect.left - clon.offsetWidth / 2}px`;
-    clon.style.top = `${e.clientY - rect.top - clon.offsetHeight / 2}px`;
-    clon.classList.add("pieza-colocada");
-    // Añadimos el clon al escenario
-    escenario.appendChild(clon);
-    addDragHandlers(clon);
-  }
-});
 
 function limpiarTablero() {
   const colocadas = document.querySelectorAll(".pieza-colocada");
@@ -185,7 +158,111 @@ function addDragHandlers(el) {
     }
   });
 
+  el.addEventListener("touchstart", (e) => {
+    e.preventDefault();
+    const touch = e.touches[0];
+    const rectEl = el.getBoundingClientRect();
+    currentMover = el;
+    offsetX = touch.clientX - rectEl.left;
+    offsetY = touch.clientY - rectEl.top;
+    el.style.zIndex = "1000";
+  });
+
+  document.addEventListener("touchmove", (e) => {
+    if (currentMover) {
+      const touch = e.touches[0];
+      const rect = escenario.getBoundingClientRect();
+      currentMover.style.left = `${touch.clientX - rect.left - offsetX}px`;
+      currentMover.style.top = `${touch.clientY - rect.top - offsetY}px`;
+    }
+  });
+
+  document.addEventListener("touchend", () => {
+    if (currentMover) {
+      currentMover.style.zIndex = "";
+      currentMover = null;
+    }
+  });
+
   el.addEventListener("dblclick", () => el.remove());
+
+  let lastTap = 0;
+  el.addEventListener("touchend", (e) => {
+    const currentTime = new Date().getTime();
+    const tapLength = currentTime - lastTap;
+    if (tapLength < 300 && tapLength > 0) {
+      el.remove();
+    }
+    lastTap = currentTime;
+  });
+}
+
+function habilitarArrastreBandeja(img) {
+  let offsetX, offsetY;
+  let piezaMoviendo = null;
+
+  
+  img.addEventListener("mousedown", (e) => {
+    e.preventDefault();
+    const rectEsc = escenario.getBoundingClientRect();
+    piezaMoviendo = img.cloneNode(true);
+    piezaMoviendo.style.position = "absolute";
+    piezaMoviendo.classList.add("pieza-colocada");
+    piezaMoviendo.style.left = `${e.clientX - rectEsc.left - img.offsetWidth / 2}px`;
+    piezaMoviendo.style.top = `${e.clientY - rectEsc.top - img.offsetHeight / 2}px`;
+    escenario.appendChild(piezaMoviendo);
+    offsetX = img.offsetWidth / 2;
+    offsetY = img.offsetHeight / 2;
+    piezaMoviendo.style.zIndex = "1000";
+  });
+
+  document.addEventListener("mousemove", (e) => {
+    if (piezaMoviendo) {
+      const rectEsc = escenario.getBoundingClientRect();
+      piezaMoviendo.style.left = `${e.clientX - rectEsc.left - offsetX}px`;
+      piezaMoviendo.style.top = `${e.clientY - rectEsc.top - offsetY}px`;
+    }
+  });
+
+  document.addEventListener("mouseup", () => {
+    if (piezaMoviendo) {
+      piezaMoviendo.style.zIndex = "";
+      addDragHandlers(piezaMoviendo);
+      piezaMoviendo = null;
+    }
+  });
+
+  img.addEventListener("touchstart", (e) => {
+    e.preventDefault();
+    const touch = e.touches[0];
+    const rectEsc = escenario.getBoundingClientRect();
+    piezaMoviendo = img.cloneNode(true);
+    piezaMoviendo.style.position = "absolute";
+    piezaMoviendo.classList.add("pieza-colocada");
+    piezaMoviendo.style.left = `${touch.clientX - rectEsc.left - img.offsetWidth / 2}px`;
+    piezaMoviendo.style.top = `${touch.clientY - rectEsc.top - img.offsetHeight / 2}px`;
+    escenario.appendChild(piezaMoviendo);
+    offsetX = img.offsetWidth / 2;
+    offsetY = img.offsetHeight / 2;
+    piezaMoviendo.style.zIndex = "1000";
+  });
+
+  document.addEventListener("touchmove", (e) => {
+    if (piezaMoviendo) {
+      const touch = e.touches[0];
+      const rectEsc = escenario.getBoundingClientRect();
+      piezaMoviendo.style.left = `${touch.clientX - rectEsc.left - offsetX}px`;
+      piezaMoviendo.style.top = `${touch.clientY - rectEsc.top - offsetY}px`;
+    }
+  });
+
+  document.addEventListener("touchend", () => {
+    if (piezaMoviendo) {
+      piezaMoviendo.style.zIndex = "";
+      addDragHandlers(piezaMoviendo);
+      piezaMoviendo = null;
+    }
+  });
 }
 
 const escenas = {
@@ -243,7 +320,6 @@ const escenas = {
 function cambiarFondo(rutaFondo) {
   const escena = escenas[rutaFondo];
   if (!escena) return;
-
   document.getElementById("fondo-impresion").src = rutaFondo;
   document.getElementById("titulo-escena").innerText = escena.nombre;
   limpiarTablero();
@@ -258,7 +334,7 @@ function actualizarBandeja(figuras) {
     img.src = figura.src;
     img.id = figura.id;
     img.className = "pieza";
-    img.draggable = true;
+    habilitarArrastreBandeja(img);
     bandeja.appendChild(img);
   });
 }
